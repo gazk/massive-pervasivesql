@@ -1,3 +1,8 @@
+Fork of Massive for Pervasive SQL
+---------------------------------
+Tested with Pervasive V10 and V11.
+TODO : Paging and Schema support.
+
 Massive is a Single File Database Lover. It's Better Than Chocolate. No Really.
 ===============================================================================
 
