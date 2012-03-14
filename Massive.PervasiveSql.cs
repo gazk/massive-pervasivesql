@@ -150,8 +150,10 @@ namespace Massive.PervasiveSql {
             string def = column.COLUMN_DEFAULT;
             if (String.IsNullOrEmpty(def)) {
                 result = null;
-            } else if (def == "getdate()" || def == "(getdate())") {
+            } else if (def.ToLower() == "curdate()" || def.ToLower() == "(curdate())") {
                 result = DateTime.Now.ToShortDateString();
+            } else if (def.ToLower() == "curtime()" || def.ToLower() == "(curtime())") {
+                result = DateTime.Now.ToShortTimeString();
             } else if (def == "newid()") {
                 result = Guid.NewGuid().ToString();
             } else {
@@ -182,8 +184,11 @@ namespace Massive.PervasiveSql {
         public IEnumerable<dynamic> Schema {
             get {
                 if (_schema == null)
-                    _schema = Query("SELECT * FROM X$File WHERE Xf$Name = @0", TableName); // TODO: This isn't right for PSQL
-                return _schema;
+                    _schema = Query("SELECT RTRIM(Xe$Name) AS COLUMN_NAME, IFNULL(a.Xa$Attrs, '') AS COLUMN_DEFAULT FROM X$File fi " + 
+                                    "LEFT JOIN X$Field fe ON fi.xf$id = fe.xe$file " + 
+                                    "LEFT JOIN x$Attrib a ON a.Xa$Id = fe.Xe$Id " +
+                                    "WHERE fi.Xf$Name = ? AND fe.Xe$DataType <> 227 AND fe.Xe$DataType <> 255 ORDER BY fe.Xe$Id", TableName);
+                return _schema;                
             }
         }
 
